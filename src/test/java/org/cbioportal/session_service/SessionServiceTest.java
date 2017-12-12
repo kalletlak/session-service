@@ -373,7 +373,11 @@ public class SessionServiceTest {
     @Test
     public void deleteSessionValidIdWrongSource() throws Exception {
         // first add data
-        String data = "\"portal-session\":{\"arg1\":\"first argument\"}";
+    		String data = "\"name\":\"name\","
+	    			+ "\"description\":\"description\","
+	    			+ "\"studies\":[{\"id\":\"study_1\",\"samples\":[\"sample_11\"]}],"
+	    			+ "\"owner\":\"user1@gmail.com\","
+	    			+ "\"origin\":[\"study_1\"]";
         ResponseEntity<String> response = addData("msk_portal", "virtual_study", data);
 
         // get id
@@ -428,6 +432,8 @@ public class SessionServiceTest {
         // { and } are special characters in regexes, but also used in JSON so we need to escape them
         data = data.replaceAll("\\{", "\\\\{");
         data = data.replaceAll("\\}", "\\\\}");
+        data = data.replaceAll("\\[", "\\\\[");
+        data = data.replaceAll("\\]", "\\\\]");
         String pattern = "\\{\"id\":\"([^\"]+)\",\"data\":\\{" 
             + data + "\\},\"source\":\"" + source + "\",\"type\":\"" + type + "\"\\}";
         if (plural) {

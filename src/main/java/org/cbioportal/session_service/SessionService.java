@@ -32,11 +32,19 @@
 
 package org.cbioportal.session_service;
 
+import org.cbioportal.session_service.domain.Session;
+import org.cbioportal.session_service.domain.VirtualStudy;
+import org.cbioportal.session_service.mixin.SessionMixin;
+import org.cbioportal.session_service.mixin.VirtualStudyMixin;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.web.SpringBootServletInitializer;
 import org.springframework.data.mongodb.core.mapping.event.ValidatingMongoEventListener;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.springframework.context.annotation.Bean;
 
 
@@ -58,5 +66,15 @@ public class SessionService extends SpringBootServletInitializer {
 
     public static void main(String[] args) {
         SpringApplication.run(SessionService.class, args);
+    }
+    
+    @Bean
+    public MappingJackson2HttpMessageConverter customJackson2HttpMessageConverter() {
+     MappingJackson2HttpMessageConverter jsonConverter = new MappingJackson2HttpMessageConverter();
+     ObjectMapper objectMapper = new ObjectMapper();
+     objectMapper.addMixIn(VirtualStudy.class, VirtualStudyMixin.class);
+     objectMapper.addMixIn(Session.class, SessionMixin.class);
+     jsonConverter.setObjectMapper(objectMapper);
+     return jsonConverter;
     }
 }

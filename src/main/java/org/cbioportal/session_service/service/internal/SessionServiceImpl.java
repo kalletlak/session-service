@@ -34,8 +34,10 @@ package org.cbioportal.session_service.service.internal;
 
 import org.cbioportal.session_service.service.SessionService;
 import org.cbioportal.session_service.service.exception.*;
+import org.cbioportal.session_service.util.OperationType;
 import org.cbioportal.session_service.domain.Session;
 import org.cbioportal.session_service.domain.SessionRepository;
+import org.cbioportal.session_service.domain.VirtualStudy;
 
 import com.mongodb.util.JSONParseException;
 import java.lang.IllegalArgumentException;
@@ -49,6 +51,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Manda Wilson 
@@ -104,12 +107,16 @@ public class SessionServiceImpl implements SessionService {
     }
 
     @Override
-    public void updateSession(String source, String type, String id, String data) throws SessionInvalidException, 
+    public void updateSession(String source, String type, String id, String data, Optional<OperationType> operation) throws SessionInvalidException, 
         SessionNotFoundException {
         Session savedSession = sessionRepository.findOneBySourceAndTypeAndId(source, type, id);
         if (savedSession != null) {
             try {
-                savedSession.setData(data);
+	            	if(savedSession.getData() instanceof VirtualStudy && type.equals("virtual_study") && operation.isPresent()) {
+	            		savedSession.updateUserInVirtualStudy(data, operation.get());
+	            	}else {
+	            		savedSession.setData(data);
+	            	}
                 sessionRepository.saveSession(savedSession);
             } catch (ConstraintViolationException e) {
                 throw new SessionInvalidException(buildConstraintViolationExceptionMessage(e));

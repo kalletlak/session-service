@@ -34,6 +34,7 @@ package org.cbioportal.session_service.web;
 
 import org.cbioportal.session_service.domain.*;
 import org.cbioportal.session_service.service.exception.*;
+import org.cbioportal.session_service.util.OperationType;
 import org.cbioportal.session_service.service.SessionService;
 
 import org.springframework.web.bind.annotation.*;
@@ -43,8 +44,10 @@ import org.springframework.http.HttpStatus;
 import com.fasterxml.jackson.annotation.JsonView;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.constraints.Pattern;
 
 import java.io.IOException;
+import java.util.Optional;
 
 /**
  * @author Manda Wilson 
@@ -93,7 +96,7 @@ public class SessionServiceController {
         @PathVariable String type,
         @PathVariable String id, 
         @RequestBody String data) {
-        sessionService.updateSession(source, type, id, data);
+        sessionService.updateSession(source, type, id, data, Optional.empty());
     }
 
     @RequestMapping(value = "/{source}/{type}/{id}", method = RequestMethod.DELETE)
@@ -102,6 +105,32 @@ public class SessionServiceController {
         @PathVariable String id) {
         sessionService.deleteSession(source, type, id);
     } 
+    
+    //endpoint to add user from virtual study
+    // '/' is added because of spring-path-variable-truncate-after-dot-annotation 
+    @RequestMapping(value = "/{source}/{type}/{id}/user/{userId}/", method = RequestMethod.POST)
+    public void addUserInVirtualStudy(
+    		@PathVariable String source,
+    		@Pattern(regexp="virtual_study", message="valid types are: 'virtual_study'")
+    		@PathVariable String type,
+    		@PathVariable String id,
+    		@PathVariable String userId) {
+    	
+        sessionService.updateSession(source, type, id, userId, Optional.of(OperationType.ADD));
+    }
+    
+    //endpoint to delete user from virtual study
+    // '/' is added because of spring-path-variable-truncate-after-dot-annotation 
+    @RequestMapping(value = "/{source}/{type}/{id}/user/{userId}/", method = RequestMethod.DELETE)
+    public void deleteUserInVirtualStudy(
+    		@PathVariable String source,
+    		@Pattern(regexp="virtual_study", message="valid types are: 'virtual_study'")
+    		@PathVariable String type,
+    		@PathVariable String id,
+    		@PathVariable String userId) {
+    	
+        sessionService.updateSession(source, type, id, userId, Optional.of(OperationType.DELETE));
+    }
 
     @ExceptionHandler
     public void handleSessionInvalid(SessionInvalidException e, HttpServletResponse response) 

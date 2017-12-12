@@ -35,16 +35,23 @@ package org.cbioportal.session_service.domain;
 import org.springframework.data.annotation.Id;
 import org.springframework.util.DigestUtils;
 
+import java.io.IOException;
+import java.util.Set;
+
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.validation.constraints.Pattern;
 
+import org.cbioportal.session_service.service.exception.SessionInvalidException;
+import org.cbioportal.session_service.util.OperationType;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonView;
-
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.util.JSON; // save as JSON, not String of JSON
+
+
 
 /**
  * @author Manda Wilson 
@@ -82,10 +89,45 @@ public class Session {
     }
 
     public void setData(String data) {
-        this.data = JSON.parse(data);
-        // JSON.serialize it so that formatting is the same if we test later
-        this.checksum = DigestUtils.md5DigestAsHex(JSON.serialize(this.data).getBytes());
+    		//validate data if type is virtual_study
+	    	if(this.type.equals("virtual_study")) {
+	        	try {
+	        		ObjectMapper mapper = new ObjectMapper();
+	    			VirtualStudy obj = mapper.readValue(data, VirtualStudy.class);
+	    			//this.data = JSON.parse(mapper.writeValueAsString(obj));
+	    			this.data = obj;
+	    			// JSON.serialize it so that formatting is the same if we test later
+	    		    this.checksum = DigestUtils.md5DigestAsHex(mapper.writeValueAsString(obj).getBytes());
+	    		} catch (IOException e) {
+	    			e.printStackTrace();
+	    			throw new SessionInvalidException(e.getMessage());
+	    		}
+	    	} else {
+	    		this.data = JSON.parse(data);
+	    		// JSON.serialize it so that formatting is the same if we test later
+	        this.checksum = DigestUtils.md5DigestAsHex(JSON.serialize(this.data).getBytes());
+	    	}
+       
     }
+    
+    public void updateUserInVirtualStudy(String userId, OperationType operation) {
+		//validate data if type is virtual_study
+		VirtualStudy obj = (VirtualStudy) this.data;
+		Set<String> users = obj.getUsers();
+		switch (operation)
+	    {
+	      case ADD: {
+		    	  users.add(userId);
+		    	  break;
+	      }
+	      case DELETE: {
+		    	  users.remove(userId);
+		    	  break;
+	      }
+	    }
+		obj.setUsers(users);
+		this.data = obj;   
+    	}
 
     @JsonView(Session.Views.Full.class)
     public Object getData() {
