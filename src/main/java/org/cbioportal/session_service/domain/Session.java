@@ -41,6 +41,8 @@ import org.springframework.util.DigestUtils;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.util.JSON; // save as JSON, not String of JSON
 
 /**
@@ -60,14 +62,6 @@ public class Session {
     @NotNull
     private SessionType type;
     
-    
-    private Session() {}
-
-    public Session(String source, SessionType type, String data) {
-        this.source = source;
-        this.type = type;
-        this.setData(data);
-    }
 
     @JsonView(Session.Views.IdOnly.class)
     public String getId() {
@@ -78,8 +72,18 @@ public class Session {
         return checksum;
     }
 
-    public void setData(String data) {
-        this.data = JSON.parse(data);
+    public void setData(Object data) {
+        ObjectMapper mapper = new ObjectMapper();
+        
+        try {
+            if(data instanceof String) {
+                this.data = JSON.parse((String)data);
+            } else {
+                this.data = JSON.parse(mapper.writeValueAsString(data)); 
+            }
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
         // JSON.serialize it so that formatting is the same if we test later
         this.checksum = DigestUtils.md5DigestAsHex(JSON.serialize(this.data).getBytes());
     }
@@ -105,11 +109,6 @@ public class Session {
     @JsonView(Session.Views.Full.class)
     public String getSource() {
         return source;
-    }
-
-    @Override
-    public String toString() {
-        return data.toString();
     }
 
     public static final class Views {

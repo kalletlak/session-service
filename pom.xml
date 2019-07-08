@@ -20,15 +20,15 @@
     <profiles>
         <profile>
             <id>war</id>
-            <activation>
-            <activeByDefault>true</activeByDefault>
-            </activation>
             <properties>
                 <packaging.type>war</packaging.type>
             </properties>
         </profile>
         <profile>
             <id>jar</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
             <properties>
                 <packaging.type>jar</packaging.type>
             </properties>
@@ -99,6 +99,58 @@
                     <execution>
                         <goals>
                             <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+			   <groupId>org.apache.maven.plugins</groupId>
+			   <artifactId>maven-jar-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+						<configuration>
+							<classifier>model</classifier>
+							<includes>
+								<include>org/cbioportal/session_service/domain/**</include>
+							</includes>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+            <plugin>  <!-- Create sources.jar -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+				<configuration>
+					<includes>
+						<include>org/cbioportal/session_service/domain/**</include>
+					</includes>
+				</configuration>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+		          <includes>
+		            <include>org/cbioportal/session_service/domain/**</include>
+		          </includes>
+				</configuration>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
                         </goals>
                     </execution>
                 </executions>
