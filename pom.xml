@@ -20,15 +20,15 @@
     <profiles>
         <profile>
             <id>war</id>
-            <activation>
-            <activeByDefault>true</activeByDefault>
-            </activation>
             <properties>
                 <packaging.type>war</packaging.type>
             </properties>
         </profile>
         <profile>
             <id>jar</id>
+            <activation>
+            	<activeByDefault>true</activeByDefault>
+            </activation>
             <properties>
                 <packaging.type>jar</packaging.type>
             </properties>
