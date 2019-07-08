@@ -7,8 +7,8 @@
     <url>https://github.com/cBioPortal/session-service/</url>
     <groupId>org.cbioportal.session_service</groupId>
     <artifactId>session_service</artifactId>
-    <version>0.1.0</version>
-    <packaging>${packaging.type}</packaging>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
 
     <!-- inherit defaults from spring boot -->
     <parent>
@@ -92,6 +92,17 @@
 
     <build>
         <plugins>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration> <!-- Compile java 8 compatible bytecode -->
+					<source>1.8</source>
+					<target>1.8</target>
+				</configuration>
+			</plugin>
+      
+      
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
