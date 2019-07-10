@@ -26,6 +26,7 @@
         </profile>
         <profile>
             <id>jar</id>
+            <!-- Set activeByDefault to jar profile for jitpack to work -->
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
@@ -104,54 +105,20 @@
                 </executions>
             </plugin>
             <plugin>
-			   <groupId>org.apache.maven.plugins</groupId>
-			   <artifactId>maven-jar-plugin</artifactId>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-						<configuration>
-							<classifier>model</classifier>
-							<includes>
-								<include>org/cbioportal/session_service/domain/**</include>
-							</includes>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-            <plugin>  <!-- Create sources.jar -->
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-				<configuration>
-					<includes>
-						<include>org/cbioportal/session_service/domain/**</include>
-					</includes>
-				</configuration>
+               <groupId>org.apache.maven.plugins</groupId>
+               <artifactId>maven-jar-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>attach-sources</id>
+                        <phase>package</phase>
                         <goals>
                             <goal>jar</goal>
                         </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-		          <includes>
-		            <include>org/cbioportal/session_service/domain/**</include>
-		          </includes>
-				</configuration>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
+                        <configuration>
+                            <classifier>model</classifier>
+                            <includes>
+                                <include>org/cbioportal/session_service/domain/**</include>
+                            </includes>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

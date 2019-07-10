@@ -73,16 +73,10 @@ public class Session {
     }
 
     public void setData(Object data) {
-        ObjectMapper mapper = new ObjectMapper();
-        
-        try {
-            if(data instanceof String) {
-                this.data = JSON.parse((String)data);
-            } else {
-                this.data = JSON.parse(mapper.writeValueAsString(data)); 
-            }
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
+        if(data instanceof String) {
+            this.data = JSON.parse((String)data);
+        } else {
+            this.data = data; 
         }
         // JSON.serialize it so that formatting is the same if we test later
         this.checksum = DigestUtils.md5DigestAsHex(JSON.serialize(this.data).getBytes());
